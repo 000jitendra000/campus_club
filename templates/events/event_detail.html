@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-9 col-lg-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h3 mb-0">
+        <i class="bi bi-info-circle me-2 text-primary"></i>Event Details
+      </h1>
+      <a href="{% url 'event_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>My Events
+      </a>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">{{ event.title }}</h2>
+        <span class="badge bg-{{ event.badge_colour }} fs-6">
+          {{ event.get_status_display }}
+        </span>
+      </div>
+      <div class="card-body p-4">
+        <dl class="row mb-0">
+          <dt class="col-sm-3 text-muted">Description</dt>
+          <dd class="col-sm-9">{{ event.description|linebreaksbr }}</dd>
+
+          <dt class="col-sm-3 text-muted">Date &amp; Time</dt>
+          <dd class="col-sm-9">{{ event.date|date:"l, d F Y \a\t H:i" }}</dd>
+
+          <dt class="col-sm-3 text-muted">Venue</dt>
+          <dd class="col-sm-9">{{ event.venue }}</dd>
+
+          <dt class="col-sm-3 text-muted">Department</dt>
+          <dd class="col-sm-9">{{ event.department|default:"—" }}</dd>
+
+          <dt class="col-sm-3 text-muted">Organizer</dt>
+          <dd class="col-sm-9">{{ event.organizer.username }}</dd>
+
+          <dt class="col-sm-3 text-muted">Created</dt>
+          <dd class="col-sm-9">{{ event.created_at|date:"d M Y, H:i" }}</dd>
+
+          <dt class="col-sm-3 text-muted">Last Updated</dt>
+          <dd class="col-sm-9">{{ event.updated_at|date:"d M Y, H:i" }}</dd>
+        </dl>
+      </div>
+
+      {% if event.is_draft %}
+      <div class="card-footer d-flex gap-2">
+        <a href="{% url 'event_edit' event.pk %}" class="btn btn-primary" id="edit-event-btn">
+          <i class="bi bi-pencil me-1"></i>Edit Event
+        </a>
+        <a href="{% url 'event_delete' event.pk %}" class="btn btn-outline-danger" id="delete-event-btn">
+          <i class="bi bi-trash me-1"></i>Delete
+        </a>
+        <form method="post" action="{% url 'event_submit' event.pk %}" class="ms-auto"
+          onsubmit="return confirm('Submit this event for HOD approval? You will not be able to edit or delete it afterwards.');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success" id="submit-event-btn">
+            <i class="bi bi-send me-1"></i>Submit for Approval
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="card-footer text-muted small">
+        <i class="bi bi-lock me-1"></i>
+        This event is <strong>{{ event.get_status_display }}</strong> and can no longer be edited or deleted.
+      </div>
+      {% endif %}
+    </div>
+
+    {% if event.status == 'rejected' and event.rejection_reason %}
+    <div class="alert alert-danger mt-3" role="alert">
+      <h5 class="alert-heading"><i class="bi bi-x-octagon me-2"></i>Rejection Reason</h5>
+      <p class="mb-0">{{ event.rejection_reason|linebreaksbr }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Registration card -->
+    <div class="card shadow-sm mt-4">
+      <div class="card-header">
+        <i class="bi bi-ui-checks me-1"></i>Registration
+      </div>
+      <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <div>
+          <span class="fs-4 fw-bold">{{ event.registrations.count }}</span>
+          <span class="text-muted">applicant{{ event.registrations.count|pluralize }}</span>
+        </div>
+        <a href="{% url 'form_builder' event.pk %}" class="btn btn-outline-primary" id="manage-form-btn">
+          <i class="bi bi-ui-checks me-1"></i>Manage Registration Form
+        </a>
+        <a href="{% url 'applicant_list' event.pk %}" class="btn btn-outline-success" id="view-applicants-btn">
+          <i class="bi bi-people me-1"></i>View Applicants
+        </a>
+        {% if event.status == 'approved' or event.status == 'completed' %}
+        <a href="{% url 'attendance' event.pk %}" class="btn btn-outline-warning" id="take-attendance-btn">
+          <i class="bi bi-clipboard-check me-1"></i>Take Attendance
+        </a>
+        {% endif %}
+      </div>
+      {% if event.is_draft %}
+      <div class="card-footer text-muted small">
+        Set up your registration questions before submitting. The form is locked once the event is submitted.
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

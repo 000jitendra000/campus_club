@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Review Events — Campus Club{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-clipboard-check me-2 text-primary"></i>Review Events
+        {% if user.department %}
+        <small class="text-muted fs-6">— {{ user.department }}</small>
+        {% endif %}
+    </h1>
+    <a href="{% url 'hod_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Dashboard
+    </a>
+</div>
+
+{% if not user.department %}
+<div class="alert alert-warning">
+    Your account has no department assigned, so there are no events to review.
+    Please ask an administrator to set your department.
+</div>
+{% endif %}
+
+<h2 class="h5 mb-3">Pending Approval</h2>
+{% if events %}
+<div class="table-responsive mb-5">
+    <table class="table table-hover align-middle shadow-sm rounded">
+        <thead class="table-primary">
+            <tr>
+                <th>Title</th>
+                <th>Organizer</th>
+                <th>Date &amp; Time</th>
+                <th>Venue</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td class="fw-semibold">{{ event.title }}</td>
+                <td>{{ event.organizer.username }}</td>
+                <td>{{ event.date|date:"d M Y, H:i" }}</td>
+                <td>{{ event.venue }}</td>
+                <td class="text-center">
+                    <a href="{% url 'hod_event_detail' event.pk %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye me-1"></i>Review
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted mb-5">No events are waiting for approval.</p>
+{% endif %}
+
+<h2 class="h5 mb-3">Reviewed Events</h2>
+{% if reviewed_events %}
+<div class="table-responsive">
+    <table class="table table-sm align-middle shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Organizer</th>
+                <th>Date &amp; Time</th>
+                <th>Status</th>
+                <th class="text-center">View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in reviewed_events %}
+            <tr>
+                <td>{{ event.title }}</td>
+                <td>{{ event.organizer.username }}</td>
+                <td>{{ event.date|date:"d M Y, H:i" }}</td>
+                <td>
+                    <span class="badge bg-{{ event.badge_colour }}">{{ event.get_status_display }}</span>
+                </td>
+                <td class="text-center">
+                    <a href="{% url 'hod_event_detail' event.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">No events have been reviewed yet.</p>
+{% endif %}
+{% endblock %}

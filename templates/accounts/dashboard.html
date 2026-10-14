@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}{{ dashboard_title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-9 col-lg-8">
+
+    <!-- Welcome card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h1 class="h5 mb-0">
+          <i class="bi bi-speedometer2 me-2"></i>{{ dashboard_title }}
+        </h1>
+      </div>
+      <div class="card-body p-4">
+        <p class="fs-5">
+          Welcome, <strong>{{ user.username }}</strong>!
+        </p>
+
+        <table class="table table-borderless table-sm mb-0">
+          <tbody>
+            <tr>
+              <th scope="row" class="text-muted" style="width:140px">Role</th>
+              <td>
+                <span class="badge bg-primary">{{ role_label }}</span>
+              </td>
+            </tr>
+            {% if user.department %}
+            <tr>
+              <th scope="row" class="text-muted">Department</th>
+              <td>{{ user.department }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <th scope="row" class="text-muted">Email</th>
+              <td>{{ user.email }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if user.role == 'organizer' %}
+    {# ---------------- ORGANIZER ---------------- #}
+    <div class="row g-3 mb-4">
+      <div class="col-6">
+        <div class="card text-center border-primary">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-primary">{{ total_events }}</div>
+            <div class="text-muted small">Total Events</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card text-center border-secondary">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-secondary">{{ draft_events }}</div>
+            <div class="text-muted small">Draft Events</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <i class="bi bi-lightning-charge me-1"></i>Quick Actions
+      </div>
+      <div class="card-body d-flex gap-3">
+        <a href="{% url 'event_list' %}" class="btn btn-outline-primary" id="my-events-btn">
+          <i class="bi bi-calendar-event me-1"></i>My Events
+        </a>
+        <a href="{% url 'event_create' %}" class="btn btn-primary" id="create-event-dashboard-btn">
+          <i class="bi bi-plus-circle me-1"></i>Create Event
+        </a>
+      </div>
+    </div>
+
+
+    {% elif user.role == 'hod' %}
+    {# ---------------- HOD ---------------- #}
+    <div class="row g-3 mb-4">
+      <div class="col-6">
+        <div class="card text-center border-warning">
+          <div class="card-body">
+            <div class="display-5 fw-bold text-warning">{{ pending_count }}</div>
+            <div class="text-muted small">Pending Approvals</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <i class="bi bi-lightning-charge me-1"></i>Quick Actions
+      </div>
+      <div class="card-body">
+        <a href="{% url 'hod_event_list' %}" class="btn btn-primary" id="review-events-btn">
+          <i class="bi bi-clipboard-check me-1"></i>Review Events
+        </a>
+      </div>
+    </div>
+
+    {% else %}
+    {# ---------------- PARTICIPANT ---------------- #}
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <i class="bi bi-lightning-charge me-1"></i>Quick Actions
+      </div>
+      <div class="card-body">
+        <a href="{% url 'student_event_list' %}" class="btn btn-primary me-2" id="browse-events-btn">
+          <i class="bi bi-calendar-event me-1"></i>Browse Events
+        </a>
+        <a href="{% url 'my_registrations' %}" class="btn btn-outline-primary" id="my-registrations-btn">
+          <i class="bi bi-journal-check me-1"></i>My Registrations
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Logout button -->
+    <div class="mt-4 text-end">
+      <form method="post" action="{% url 'logout' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger" id="dashboard-logout-btn">
+          <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

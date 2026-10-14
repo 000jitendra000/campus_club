@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance — {{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">
+        <i class="bi bi-clipboard-check me-2 text-primary"></i>Attendance
+    </h1>
+    <a href="{% url 'event_detail' event.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to Event
+    </a>
+</div>
+
+<p class="text-muted">
+    <strong>{{ event.title }}</strong> &middot; {{ event.date|date:"d M Y, H:i" }} &middot; {{ event.venue }}
+</p>
+
+<!-- Counts -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body py-2">
+                <div class="fs-3 fw-bold text-primary" id="count-total">{{ counts.total }}</div>
+                <div class="text-muted small">Registered</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body py-2">
+                <div class="fs-3 fw-bold text-success" id="count-present">{{ counts.present }}</div>
+                <div class="text-muted small">Present</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-danger">
+            <div class="card-body py-2">
+                <div class="fs-3 fw-bold text-danger" id="count-absent">{{ counts.absent }}</div>
+                <div class="text-muted small">Absent</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-secondary">
+            <div class="card-body py-2">
+                <div class="fs-3 fw-bold text-secondary" id="count-not-marked">{{ counts.not_marked }}</div>
+                <div class="text-muted small">Not Yet Marked</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="btn-group mb-3" role="group" aria-label="Filter">
+    <a href="{% url 'attendance' event.pk %}"
+        class="btn btn-sm {% if not show_unmarked %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        All
+    </a>
+    <a href="{% url 'attendance' event.pk %}?filter=unmarked"
+        class="btn btn-sm {% if show_unmarked %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        Not Marked Only
+    </a>
+</div>
+
+{% if registrations %}
+<div class="table-responsive">
+    <table class="table align-middle shadow-sm rounded">
+        <thead class="table-primary">
+            <tr>
+                <th>Name</th>
+                <th>Roll No.</th>
+                <th>Department</th>
+                <th>Registered</th>
+                <th>Status</th>
+                <th class="text-center">Mark</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in registrations %}
+            <tr {% if reg.attendance_status == 'not_marked' %}class="table-warning"{% endif %}>
+                <td class="fw-semibold">{{ reg.student.get_full_name|default:reg.student.username }}</td>
+                <td>{{ reg.student.roll_number|default:"—" }}</td>
+                <td>{{ reg.student.department|default:"—" }}</td>
+                <td class="small text-muted">{{ reg.applied_at|date:"d M Y, H:i" }}</td>
+                <td>
+                    <span class="badge bg-{{ reg.attendance_badge }}">{{ reg.get_attendance_status_display }}</span>
+                    {% if reg.attendance_marked_at %}
+                    <div class="small text-muted">
+                        {{ reg.attendance_marked_at|date:"d M, H:i" }}
+                        {% if reg.attendance_marked_by %}by {{ reg.attendance_marked_by.username }}{% endif %}
+                    </div>
+                    {% endif %}
+                </td>
+                <td class="text-center text-nowrap">
+                    <form method="post" action="{% url 'attendance_mark' event.pk reg.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="present">
+                        {% if show_unmarked %}<input type="hidden" name="filter" value="unmarked">{% endif %}
+                        <button type="submit" class="btn btn-sm btn-success"
+                            {% if reg.attendance_status == 'present' %}disabled{% endif %}>
+                            <i class="bi bi-check-lg me-1"></i>Present
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'attendance_mark' event.pk reg.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="status" value="absent">
+                        {% if show_unmarked %}<input type="hidden" name="filter" value="unmarked">{% endif %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            {% if reg.attendance_status == 'absent' %}disabled{% endif %}>
+                            <i class="bi bi-x-lg me-1"></i>Absent
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="bi bi-person-x text-muted" style="font-size:3rem"></i>
+    {% if show_unmarked and counts.total %}
+    <h4 class="mt-3 text-muted">Everyone has been marked</h4>
+    <a href="{% url 'attendance' event.pk %}" class="btn btn-outline-primary mt-2">Show All</a>
+    {% else %}
+    <h4 class="mt-3 text-muted">No registered students</h4>
+    <p class="text-muted">Attendance can be taken once students register.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

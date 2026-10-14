@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} — Review — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-clipboard-check me-2 text-primary"></i>Event Review
+            </h1>
+            <a href="{% url 'hod_event_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to Review List
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">{{ event.title }}</h2>
+                <span class="badge bg-{{ event.badge_colour }} fs-6">{{ event.get_status_display }}</span>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-muted">Description</dt>
+                    <dd class="col-sm-9">{{ event.description|linebreaksbr }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Date &amp; Time</dt>
+                    <dd class="col-sm-9">{{ event.date|date:"l, d F Y \a\t H:i" }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Venue</dt>
+                    <dd class="col-sm-9">{{ event.venue }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Department</dt>
+                    <dd class="col-sm-9">{{ event.department|default:"—" }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Organizer</dt>
+                    <dd class="col-sm-9">{{ event.organizer.username }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Created</dt>
+                    <dd class="col-sm-9">{{ event.created_at|date:"d M Y, H:i" }}</dd>
+                </dl>
+            </div>
+
+            {% if event.status == 'pending' %}
+            <div class="card-footer">
+                <div class="d-flex gap-2 mb-3">
+                    <form method="post" action="{% url 'hod_event_approve' event.pk %}"
+                        onsubmit="return confirm('Approve this event?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success" id="approve-event-btn">
+                            <i class="bi bi-check-circle me-1"></i>Approve
+                        </button>
+                    </form>
+                </div>
+                <form method="post" action="{% url 'hod_event_reject' event.pk %}" id="reject-form">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <label for="rejection_reason" class="form-label fw-semibold text-danger">
+                            Rejection Reason <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" name="rejection_reason" id="rejection_reason"
+                            rows="3" required
+                            placeholder="Explain why this event is being rejected…"></textarea>
+                        <div class="form-text text-muted">Required. The organizer will see this reason.</div>
+                    </div>
+                    <button type="submit" class="btn btn-danger" id="reject-event-btn">
+                        <i class="bi bi-x-circle me-1"></i>Reject with Reason
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="card-footer text-muted small">
+                <i class="bi bi-lock me-1"></i>
+                This event is <strong>{{ event.get_status_display }}</strong> and can no longer be reviewed.
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

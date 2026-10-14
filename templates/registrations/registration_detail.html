@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}My Application — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-file-text me-2 text-primary"></i>My Application
+            </h1>
+            <a href="{% url 'my_registrations' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>My Registrations
+            </a>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ registration.event.title }}</span>
+                <span class="badge bg-success">Registered</span>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Date &amp; Time</dt>
+                    <dd class="col-sm-8">{{ registration.event.date|date:"l, d F Y \a\t H:i" }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Venue</dt>
+                    <dd class="col-sm-8">{{ registration.event.venue }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Applied On</dt>
+                    <dt class="col-sm-4 text-muted">Applied On</dt>
+                    <dd class="col-sm-8">{{ registration.applied_at|date:"d M Y, H:i" }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Attendance</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ registration.attendance_badge }}">{{
+                            registration.get_attendance_status_display }}</span>
+                    </dd>
+                </dl>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{% url 'student_event_detail' registration.event.pk %}" class="btn btn-sm btn-outline-primary">
+                    View Event Details
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">My Answers</div>
+            <div class="card-body">
+                {% if qa_pairs %}
+                <dl class="row mb-0">
+                    {% for question, answer in qa_pairs %}
+                    <dt class="col-sm-4 text-muted">{{ question.label }}</dt>
+                    <dd class="col-sm-8">{{ answer|default:"—"|linebreaksbr }}</dd>
+                    {% endfor %}
+                </dl>
+                {% else %}
+                <p class="text-muted mb-0">This event had no extra questions.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

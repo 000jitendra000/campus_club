@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="card-title h4 text-center mb-4">
+          <i class="bi bi-box-arrow-in-right me-2 text-primary"></i>Sign In
+        </h1>
+
+        <form method="post" action="{% url 'login' %}" novalidate id="login-form">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label fw-semibold">Username</label>
+            <input
+              type="text"
+              id="id_username"
+              name="username"
+              class="form-control"
+              placeholder="Enter your username"
+              required
+              autofocus
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password" class="form-label fw-semibold">Password</label>
+            <input
+              type="password"
+              id="id_password"
+              name="password"
+              class="form-control"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary" id="login-submit-btn">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </button>
+          </div>
+        </form>
+
+        <hr />
+        <p class="text-center text-muted mb-0">
+          New student?
+          <a href="{% url 'register' %}">Create an account</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Applicant — {{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-person-lines-fill me-2 text-primary"></i>Applicant Details
+            </h1>
+            <a href="{% url 'applicant_list' event.pk %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>All Applicants
+            </a>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">{{ event.title }}</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Name</dt>
+                    <dd class="col-sm-8">{{ registration.student.get_full_name|default:registration.student.username }}
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Roll Number</dt>
+                    <dd class="col-sm-8">{{ registration.student.roll_number|default:"—" }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Email</dt>
+                    <dd class="col-sm-8">{{ registration.student.email }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Department</dt>
+                    <dd class="col-sm-8">{{ registration.student.department|default:"—" }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Applied</dt>
+                    <dd class="col-sm-8">{{ registration.applied_at|date:"d M Y, H:i" }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Attendance</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-{{ registration.attendance_badge }}">{{ registration.get_attendance_status_display }}</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">Answers</div>
+            <div class="card-body">
+                {% if qa_pairs %}
+                <dl class="row mb-0">
+                    {% for question, answer in qa_pairs %}
+                    <dt class="col-sm-4 text-muted">{{ question.label }}</dt>
+                    <dd class="col-sm-8">{{ answer|default:"—"|linebreaksbr }}</dd>
+                    {% endfor %}
+                </dl>
+                {% else %}
+                <p class="text-muted mb-0">This event has no custom questions.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

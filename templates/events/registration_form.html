@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Register — {{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-pencil-square me-2 text-primary"></i>Register
+            </h1>
+            <a href="{% url 'student_event_detail' event.pk %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to Event
+            </a>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5">{{ event.title }}</h2>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-clock me-1"></i>{{ event.date|date:"l, d F Y \a\t H:i" }}
+                    &middot; <i class="bi bi-geo-alt me-1"></i>{{ event.venue }}
+                </p>
+            </div>
+        </div>
+
+        <form method="post" novalidate id="registration-form">
+            {% csrf_token %}
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Your Information</div>
+                <div class="card-body">
+                    {% if form.full_name %}
+                    {# First registration: ask for full name #}
+                    <div class="mb-3">
+                        <label for="{{ form.full_name.id_for_label }}" class="form-label fw-semibold">
+                            Full Name <span class="text-danger">*</span>
+                        </label>
+                        {{ form.full_name }}
+                        {% for error in form.full_name.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8">{{ user.get_full_name|default:user.username }}</dd>
+                    </dl>
+                    {% endif %}
+
+                    <dl class="row mb-0 {% if form.full_name %}mt-2{% endif %}">
+                        <dt class="col-sm-4 text-muted">College Email</dt>
+                        <dd class="col-sm-8">{{ user.email }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Department</dt>
+                        <dd class="col-sm-8">{{ user.department|default:"—" }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Roll Number</dt>
+                        <dd class="col-sm-8">
+                            {% if user.roll_number %}
+                            {{ user.roll_number }}
+                            {% else %}
+                            <span class="text-muted">Enter it below</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                    <p class="form-text mb-0 mt-2">
+                        Email, department, and roll number come from your account and cannot be changed here.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Application Details</div>
+                <div class="card-body">
+                    {% if form.visible_fields %}
+                    {% include "events/_form_fields.html" %}
+                    {% else %}
+                    <p class="text-muted mb-0">No extra information is needed for this event.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success" id="submit-registration-btn">
+                    <i class="bi bi-check-circle me-1"></i>Submit Application
+                </button>
+                <a href="{% url 'student_event_detail' event.pk %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

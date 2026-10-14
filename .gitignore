@@ -1,0 +1,30 @@
+# Python byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Django
+*.pyc
+db.sqlite3
+local_settings.py
+*.log
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Environment variable files
+.env
+*.env
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Static files collected by collectstatic
+staticfiles/

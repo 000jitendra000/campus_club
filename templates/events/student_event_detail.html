@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-info-circle me-2 text-primary"></i>Event Details
+            </h1>
+            <a href="{% url 'student_event_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>All Events
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="h5 mb-0">{{ event.title }}</h2>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-muted">Description</dt>
+                    <dd class="col-sm-9">{{ event.description|linebreaksbr }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Date &amp; Time</dt>
+                    <dd class="col-sm-9">{{ event.date|date:"l, d F Y \a\t H:i" }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Venue</dt>
+                    <dd class="col-sm-9">{{ event.venue }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Department</dt>
+                    <dd class="col-sm-9">{{ event.department|default:"—" }}</dd>
+
+                    <dt class="col-sm-3 text-muted">Organizer</dt>
+                    <dd class="col-sm-9">{{ event.organizer.username }}</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                {% if already_registered %}
+                <span class="badge bg-success fs-6 me-2">
+                    <i class="bi bi-check-circle me-1"></i>You have already registered for this event
+                </span>
+                <a href="{% url 'my_registrations' %}" class="btn btn-sm btn-outline-primary">My Registrations</a>
+                {% else %}
+                <a href="{% url 'event_register' event.pk %}" class="btn btn-success" id="apply-event-btn">
+                    <i class="bi bi-pencil-square me-1"></i>Apply / Register
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

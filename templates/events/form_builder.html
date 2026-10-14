@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Form — {{ event.title }} — Campus Club{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-ui-checks me-2 text-primary"></i>Registration Form
+            </h1>
+            <a href="{% url 'event_detail' event.pk %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back to Event
+            </a>
+        </div>
+
+        <p class="text-muted">
+            Event: <strong>{{ event.title }}</strong>
+            <span class="badge bg-{{ event.badge_colour }} ms-1">{{ event.get_status_display }}</span>
+        </p>
+
+        <div class="alert alert-secondary">
+            <i class="bi bi-info-circle me-1"></i>
+            Every registration form automatically includes the student's name, email,
+            roll number and department. Add only your <strong>extra</strong> questions below.
+        </div>
+
+        {% if not can_edit %}
+        <div class="alert alert-warning">
+            <i class="bi bi-lock me-1"></i>{{ lock_reason }}
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">Custom Questions</div>
+            {% if questions %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>Question</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Options</th>
+                            {% if can_edit %}<th class="text-center">Actions</th>{% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in questions %}
+                        <tr>
+                            <td>{{ q.order }}</td>
+                            <td class="fw-semibold">{{ q.label }}</td>
+                            <td>{{ q.get_field_type_display }}</td>
+                            <td>
+                                {% if q.required %}
+                                <span class="badge bg-danger">Required</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Optional</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ q.option_list|join:", "|default:"—" }}</td>
+                            {% if can_edit %}
+                            <td class="text-center">
+                                <a href="{% url 'form_field_edit' event.pk q.pk %}"
+                                    class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="{% url 'form_field_delete' event.pk q.pk %}"
+                                    class="d-inline" onsubmit="return confirm('Remove this question?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card-body text-muted">
+                No custom questions yet. Students will only be asked for the standard information.
+            </div>
+            {% endif %}
+        </div>
+
+        {% if can_edit %}
+        <div class="card shadow-sm">
+            <div class="card-header">Add a Question</div>
+            <div class="card-body">
+                <form method="post" novalidate id="question-form">
+                    {% csrf_token %}
+                    {% include "events/_form_fields.html" %}
+                    <button type="submit" class="btn btn-primary" id="add-question-btn">
+                        <i class="bi bi-plus-circle me-1"></i>Add Question
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

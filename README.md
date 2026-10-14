@@ -1,94 +1,91 @@
-# Campus Club — Phase 1
+# Campus Club — College Event Management System
 
-A Django web application for college club and event management.
+A Django-based web application for managing college events, student registrations, department-level event approvals, and attendance through a simple, role-based interface.
 
-## Phase 1 Features
+Campus Club provides a centralized platform where students can discover approved events and apply, organizers can create and manage events, and Heads of Department (HODs) can review events submitted for approval.
 
-- Custom user model with three roles: **Event Organizer**, **Participant (Student)**, and **HOD**
-- Secure student self-registration (always creates `PARTICIPANT` accounts)
-- Admin-managed Organizer and HOD accounts via Django Admin
-- Login / logout with role-based dashboard redirect
-- Three role-specific dashboards (placeholder content for Phase 2)
-- Server-side role enforcement (403 on unauthorized access)
-- Full automated test suite (37 tests)
+## Features
 
----
+### 1. Authentication and Role-Based Access
+- Student self-registration and login.
+- Separate roles for **Participants, Organizers, and HODs**.
+- Role-specific dashboards and navigation.
+- Access restrictions for protected pages and actions.
+- Organizer and HOD accounts managed by an administrator.
+- Django admin integration for account management.
 
-## Quick Start
+### 2. Event Management
+- Create, view, and manage college events.
+- Maintain event details such as title, description, date, venue, and department.
+- Track event status through the approval workflow.
+- Submit draft events for HOD approval.
+- Restrict event reviews to the HOD responsible for the relevant department.
+- Preserve submitted and approved event history rather than allowing unrestricted deletion.
 
-### 1. Install Dependencies
+**Event approval workflow:**
 
-```bash
-pip install -r requirements.txt
-```
+`Draft → Pending Approval → Approved / Rejected`
 
-### 2. Apply Migrations
+Students can browse approved events. Events that have not been approved are not available for student registration.
 
-```bash
-python manage.py migrate
-```
+### 3. Custom Registration Forms
+- Provide standard student information from the student's account.
+- Allow organizers to configure additional questions for their events.
+- Support short text, long text, number, dropdown, and checkbox question types.
+- Configure required questions and dropdown options.
+- Validate submitted answers on the server.
+- Prevent duplicate applications to the same event.
+- Restrict form management to the event's organizer.
+- Lock registration forms when the event enters the submission workflow or registrations already exist, according to the application's rules.
 
-### 3. Create a Superuser (for Django Admin)
+### 4. Student Applications
+- Apply to approved events.
+- View personal registrations in **My Registrations**.
+- Review submitted application details and custom answers.
+- View registration and attendance information.
+- Prevent students from viewing other students' private application details.
 
-```bash
-python manage.py createsuperuser
-```
+### 5. Organizer Applicant Management
+- View applicants for events created by the organizer.
+- Review student information and answers to custom questions.
+- Keep applicant access restricted to the relevant event organizer.
 
-### 4. Run the Development Server
+### 6. Attendance Tracking
+- View registered students for an event.
+- Mark registered students as present or absent.
+- Track attendance status for each registration.
+- Display attendance information to students for their own applications.
+- Review attendance counts for an event.
+- Restrict attendance management to authorized organizers and events.
 
-```bash
-python manage.py runserver
-```
+### 7. User Interface
+- Bootstrap-based responsive layouts.
+- Custom CSS in `static/css/style.css`.
+- Modern cards, buttons, tables, forms, alerts, and status badges.
+- Role-specific navigation and dashboards.
+- Clear event status indicators and application empty states.
 
-Open **http://127.0.0.1:8000/** in your browser.
+## Technology Stack
 
----
-
-## URL Reference
-
-| URL | Purpose |
-|-----|---------|
-| `/` | Redirects to login |
-| `/accounts/login/` | Login page |
-| `/accounts/register/` | Student self-registration |
-| `/accounts/logout/` | Logout (POST) |
-| `/dashboard/` | Role-based redirect |
-| `/dashboard/organizer/` | Organizer dashboard |
-| `/dashboard/participant/` | Participant dashboard |
-| `/dashboard/hod/` | HOD dashboard |
-| `/admin/` | Django Admin |
-
----
-
-## Creating Organizer / HOD Accounts
-
-Organizer and HOD accounts **cannot** be self-registered. Use Django Admin:
-
-1. Go to `http://127.0.0.1:8000/admin/`
-2. Log in with your superuser credentials.
-3. Click **Users → Add User**.
-4. Fill in username and password, then set **Role** and **Department**.
-
----
-
-## Running Tests
-
-```bash
-python manage.py test accounts --verbosity=2
-```
-
-Expected output: **37 tests, 0 failures, 0 errors.**
-
----
+| Technology | Purpose |
+|---|---|
+| Python | Application programming language |
+| Django | Web framework and server-side logic |
+| SQLite | Development database |
+| HTML5 | Page structure |
+| CSS3 | Custom styling |
+| Bootstrap 5 | Responsive layout and UI components |
+| Bootstrap Icons | Interface icons |
+| Django Templates | Dynamic server-rendered pages |
 
 ## Project Structure
 
-```
-campus_club/
+```text
+PBL/
 ├── manage.py
 ├── requirements.txt
-├── .gitignore
 ├── README.md
+├── .gitignore
 ├── campus_club/
 │   ├── settings.py
 │   ├── urls.py
@@ -96,42 +93,161 @@ campus_club/
 │   └── wsgi.py
 ├── accounts/
 │   ├── migrations/
-│   ├── models.py        ← Custom User model
-│   ├── forms.py         ← StudentRegistrationForm
-│   ├── views.py         ← Auth views + dashboards
-│   ├── urls.py          ← /accounts/* routes
-│   ├── dashboard_urls.py← /dashboard/* routes
-│   ├── admin.py         ← Extended UserAdmin
-│   └── tests.py         ← 37 automated tests
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── dashboard_urls.py
+│   ├── admin.py
+│   └── tests.py
+├── events/
+│   ├── migrations/
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── admin.py
+│   └── tests.py
 ├── templates/
 │   ├── base.html
 │   ├── 403.html
 │   ├── accounts/
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   └── dashboard.html
+│   ├── events/
+│   ├── registrations/
 │   └── registration/
-│       └── logged_out.html
 └── static/
     └── css/
         └── style.css
 ```
 
----
+*The exact files and template folders may vary slightly as the project evolves.*
 
-## Security Notes
+## Installation and Setup
 
-- Public registration always assigns the `PARTICIPANT` role on the server — the form does not expose a role field, and the `save()` method forcibly sets `role = PARTICIPANT` regardless of POST data.
-- Dashboard views use a `role_required` decorator that returns HTTP 403 for wrong-role access.
-- All forms use Django's CSRF protection.
-- Passwords are hashed using Django's default PBKDF2 algorithm.
-- The `SECRET_KEY` should be set via the `DJANGO_SECRET_KEY` environment variable in production.
+### Prerequisites
 
----
+- Python 3.10 or newer, compatible with the Django version in `requirements.txt`.
+- pip.
+- Git, if cloning the project repository.
 
-## Phase 2 (Not Yet Implemented)
+### 1. Clone the repository
 
-- Event CRUD (Organizer)
-- HOD event approval workflow
-- Student event browsing and registration
-- Attendance tracking
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd PBL
+```
+
+Replace the placeholder with your repository URL.
+
+### 2. Create a virtual environment
+
+**Windows PowerShell:**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+**Linux / WSL:**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### 4. Apply database migrations
+
+```bash
+python manage.py migrate
+```
+
+If you have modified Django models and new migrations have not yet been created, run:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 5. Create an administrator account
+
+```bash
+python manage.py createsuperuser
+```
+
+Follow the prompts to create the account.
+
+### 6. Start the development server
+
+```bash
+python manage.py runserver
+```
+
+Open the application at:
+
+http://127.0.0.1:8000/
+
+Access the Django administration interface at:
+
+http://127.0.0.1:8000/admin/
+
+## User Roles
+
+| Role | Responsibilities |
+|---|---|
+| Participant | Register, browse approved events, apply, view personal registrations, and check attendance |
+| Organizer | Create events, configure registration forms, submit events for approval, manage applicants, and track attendance |
+| HOD | Review events belonging to the assigned department and approve or reject submissions |
+| Administrator | Manage accounts and administrative configuration |
+
+## Typical Workflow
+
+1. An administrator creates organizer and HOD accounts and assigns departments.
+2. A student creates a participant account.
+3. An organizer creates an event and configures its registration questions.
+4. The organizer submits the event for approval.
+5. The relevant HOD reviews the event and approves or rejects it.
+6. Students browse approved events and submit applications.
+7. The organizer reviews applicants and their answers.
+8. The organizer records attendance for registered students.
+9. Students check their registration and attendance information.
+
+## Running Tests
+
+Run the Django test suite with:
+
+```bash
+python manage.py test
+```
+
+Check the project configuration with:
+
+```bash
+python manage.py check
+```
+
+These commands help identify test failures and configuration issues after code changes.
+
+## Database and Development Notes
+
+- SQLite is used for local development.
+- Database migrations are maintained by Django.
+- Do not commit secrets, environment files containing credentials, or local virtual environments.
+- Keep `db.sqlite3` out of version control unless there is a specific, intentional reason to distribute a development database.
+- Before deploying publicly, configure production settings, secret management, HTTPS, static files, and an appropriate production database.
+
+## Project Goals
+
+Campus Club aims to simplify college event administration by bringing event creation, departmental approval, student applications, and attendance tracking into one application.
+
+The project also provides practical experience with Django models, forms, authentication, authorization, relational data, server-side validation, templates, and responsive web design.
+
+## License
+
+Add a license to this project if you intend to distribute or reuse it publicly. Until a license is specified, all rights remain with the copyright holder.
+
